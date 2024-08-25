@@ -3,10 +3,11 @@ package biz
 import (
 	"context"
 	"errors"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"main.go/common"
 	"main.go/module/user/model"
 	"strconv"
-	"strings"
 )
 
 type UpdateUserStorage interface {
@@ -23,12 +24,16 @@ func (biz *UpdateUserbiz) NewUpdateUser(ctx context.Context, data *model.UpdateU
 	if data.Role == "admin" {
 		return errors.New("No permiss role for admin")
 	}
-	_, err := strconv.Atoi(data.Phone)
+	_, err := strconv.Atoi(*data.Phone)
 	if err != nil {
 		return err
 	}
-	data.FirtName = strings.Title(data.FirtName)
-	data.LastName = strings.Title(data.LastName)
+	first := *data.FirstName
+	last := *data.LastName
+	first = cases.Title(language.Und).String(first)
+	last = cases.Title(language.Und).String(last)
+	data.FirstName = &first
+	data.LastName = &last
 	if err := biz.store.UpdateUser(ctx, data, map[string]interface{}{"id": request.GetUserId()}); err != nil {
 		return err
 	}

@@ -36,6 +36,7 @@ func main() {
 	v1 := r.Group("/v1")
 	{
 		v1.PATCH("/updateUser", middlewareAuthor, ginUser2.UpdateUser(db))
+		v1.PATCH("/register_role", middlewareAuthor, ginUser2.RegisterRole(db))
 		v1.GET("/profile", middlewareAuthor, ginUser2.Profile(db))
 		v1.PUT("/upload", upload.Upload_image(db))
 		v1.POST("/register", ginUser2.CreateUser(db))

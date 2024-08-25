@@ -1,12 +1,16 @@
 package ginFollow
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"main.go/common"
 	"main.go/module/follow/biz"
 	"main.go/module/follow/model"
 	"main.go/module/follow/storage"
+	bizNotify "main.go/module/notify/biz"
+	modelNotify "main.go/module/notify/model"
+	storageNotify "main.go/module/notify/storage"
 	storageUser "main.go/module/user/storage"
 	"net/http"
 	"strconv"
@@ -29,7 +33,20 @@ func CreateFollow(db *gorm.DB) func(*gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "you can't follow yourself"})
 			return
 		}
-		if err := business.CreateFollowUser(c.Request.Context(), &user); err != nil {
+		userAccount, errUser := business.CreateFollowUser(c.Request.Context(), &user)
+		if errUser != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": errUser.Error()})
+			return
+		}
+		storeNotify := storageNotify.NewSQLModel(db)
+		businessNotify := bizNotify.NewNotifyBiz(storeNotify)
+		notify := &modelNotify.CreateNotify{
+			UserId:      user.UserId,
+			CreatorId:   user.ByUserId,
+			Message:     fmt.Sprintf("%s has been follow you ", userAccount.LastName),
+			TypeMessage: modelNotify.TypeFollow,
+		}
+		if err := businessNotify.CreateNotify(c.Request.Context(), notify); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

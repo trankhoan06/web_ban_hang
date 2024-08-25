@@ -10,6 +10,7 @@ const (
 	TypeComment
 	TypeLikeItem
 	TypeOrder
+	TypeFollow
 	TypeAppreciate
 )
 
