@@ -11,6 +11,7 @@ import (
 	ginComment "main.go/module/comment/transport/gin"
 	ginFollow "main.go/module/follow/transport/gin"
 	"main.go/module/item/transport/gin"
+	ginMessage "main.go/module/message/transport/gin"
 	ginNotify "main.go/module/notify/transport/gin"
 	ginOrder "main.go/module/order_by_user/transport/gin"
 	ginSearch "main.go/module/search_item/transport/gin"
@@ -119,6 +120,14 @@ func main() {
 			notify.PATCH("/read_notify", ginNotify.ReadNotify(db))
 			notify.DELETE("/deleted_notify", ginNotify.DeletedNotify(db))
 			notify.DELETE("/deleted_notify_of_creator", ginNotify.DeletedNotifyOfCreator(db))
+		}
+		message := v1.Group("/message", middlewareAuthor)
+		{
+			message.GET("/list_message", ginMessage.ListMessage(db))
+			message.GET("/list_user_message", ginMessage.ListUserMessage(db))
+			message.POST("/create", ginMessage.CreateMessage(db))
+			message.DELETE("/deleted_message", ginMessage.DeletedMessage(db))
+			message.DELETE("/deleted_user_message", ginMessage.DeletedUserMessage(db))
 		}
 	}
 
