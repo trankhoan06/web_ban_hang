@@ -13,7 +13,7 @@ type TodoList struct {
 	Owner       *model.SimpleUser `json:"owner" gorm:"foreignkey:UserId;references:UserId"`
 	Title       string            `json:"title" gorm:"column:title"`
 	Description string            `json:"description" gorm:"column:description"`
-	Link        string            `json:"link" gorm:"column:link"`
+	Price       int               `json:"price" gorm:"column:price"`
 	AmountItem  int               `json:"amount_item" gorm:"column:amount_item"`
 	AmountSold  int               `json:"amount_sold" gorm:"column:amount_sold"`
 	Image       *Image            `json:"image" gorm:"column:image"`
@@ -27,8 +27,9 @@ type TodoUpdateAmountItem struct {
 type TodoCreateItem struct {
 	UserId      int         `json:"-" gorm:"column:user_id"`
 	Title       string      `json:"title" gorm:"column:title"`
+	Price       int         `json:"price" gorm:"column:price"`
+	Category    string      `json:"category" gorm:"column:category"`
 	Description string      `json:"description" gorm:"column:description"`
-	Link        string      `json:"link" gorm:"column:link"`
 	AmountItem  int         `json:"amount_item" gorm:"column:amount_item"`
 	Status      *StatusItem `json:"status" gorm:"column:status"`
 	Image       *Image      `json:"image" gorm:"column:image"`
@@ -47,7 +48,6 @@ type SimpleItem struct {
 	Title       string `json:"title" gorm:"column:title"`
 	Description string `json:"description" gorm:"column:description"`
 	Image       *Image `json:"image" gorm:"column:image"`
-	Link        string `json:"link" gorm:"column:link"`
 }
 
 func (SimpleItem) TableName() string           { return "todo_items" }
