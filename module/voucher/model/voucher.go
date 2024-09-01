@@ -11,7 +11,7 @@ const (
 	TypeVoucherShip
 )
 const (
-	StatusVoucherExpire StatusVoucher = iota
+	StatusVoucherDeleted StatusVoucher = iota
 	StatusVoucherDoing
 )
 
@@ -50,15 +50,16 @@ type UpdateVoucher struct {
 	MaxDiscount   *int         `json:"max_discount" gorm:"column:max_discount"`
 	MinimumSingle *int         `json:"minimum_single" gorm:"column:minimum_single"`
 	Amount        *int         `json:"amount" gorm:"column:amount"`
-	Effective     time.Time    `json:"effective" gorm:"column:effective"`
-	Expire        time.Time    `json:"expire" gorm:"column:expire"`
+	Effective     *time.Time   `json:"effective" gorm:"column:effective"`
+	Expire        *time.Time   `json:"expire" gorm:"column:expire"`
 }
 type VoucherUser struct {
-	UserId       int       `json:"user_id" gorm:"column:user_id"`
-	VoucherId    int       `json:"voucher_id" gorm:"column:voucher_id"`
-	OwnerVoucher *Voucher  `json:"owner_voucher" gorm:"column:foreignkey:VoucherId;references:Id"`
-	Effective    time.Time `json:"effective" gorm:"column:effective"`
-	Expire       time.Time `json:"expire" gorm:"column:expire"`
+	UserId         int       `json:"user_id" gorm:"column:user_id"`
+	VoucherId      int       `json:"voucher_id" gorm:"column:voucher_id"`
+	OwnerVoucher   int       `json:"owner_voucher" gorm:"column:owner_voucher"`
+	OwnerVoucherId *Voucher  `json:"owner_voucher_id" gorm:"foreignkey:VoucherId;references:Id"`
+	Effective      time.Time `json:"effective" gorm:"column:effective"`
+	Expire         time.Time `json:"expire" gorm:"column:expire"`
 }
 
 func (CreateVoucher) TableName() string { return "voucher" }

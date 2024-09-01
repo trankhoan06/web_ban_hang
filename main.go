@@ -19,6 +19,7 @@ import (
 	"main.go/module/user/storage"
 	ginUser2 "main.go/module/user/transport/gin"
 	ginUserlikeItem "main.go/module/userlikeitem/transport/gin"
+	ginVoucher "main.go/module/voucher/transport/gin"
 	"os"
 )
 
@@ -128,6 +129,15 @@ func main() {
 			message.POST("/create", ginMessage.CreateMessage(db))
 			message.DELETE("/deleted_message", ginMessage.DeletedMessage(db))
 			message.DELETE("/deleted_user_message", ginMessage.DeletedUserMessage(db))
+		}
+		voucher := v1.Group("/voucher", middlewareAuthor)
+		{
+			voucher.POST("/create", ginVoucher.CreateVoucher(db))
+			voucher.POST("/add_voucher", ginVoucher.AddVoucher(db))
+			voucher.DELETE("/deleted_voucher", ginVoucher.DeletedVoucher(db))
+			voucher.GET("/list_voucher_vendor", ginVoucher.ListVoucherVendor(db))
+			voucher.GET("/list_my_voucher", ginVoucher.ListMyVoucher(db))
+			voucher.PATCH("/update_voucher", ginVoucher.UpdateVoucher(db))
 		}
 	}
 

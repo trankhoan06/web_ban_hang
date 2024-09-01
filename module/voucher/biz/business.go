@@ -11,7 +11,9 @@ type VoucherStorage interface {
 	ListVoucherVendor(ctx context.Context, vendorId int) (*[]model.Voucher, error)
 	ListMyVoucher(ctx context.Context, userId int) (*[]model.VoucherUser, error)
 	DeletedVoucherVendor(ctx context.Context, VoucherId, userId int) error
-	DeletedVoucherUser(ctx context.Context, VoucherId int) error
+	DeletedVoucherUser(ctx context.Context, ownerVoucher int) error
+	AddVoucher(ctx context.Context, data *model.VoucherUser) error
+	UpdateVoucher(ctx context.Context, voucherId int, data *model.UpdateVoucher) error
 }
 
 type VoucherBiz struct {
