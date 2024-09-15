@@ -1,5 +1,5 @@
 package model
 
 type Filter struct {
-	Status string `json:"status" form:"status"`
+	Status int `json:"status" form:"status"`
 }

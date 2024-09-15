@@ -31,7 +31,7 @@ func LoginUser(db *gorm.DB, provider tokenProvider.Provider) func(*gin.Context) 
 			CreateAt: time.Now(),
 		}
 		hash := common.NewSha256Hash()
-		business := biz.NewLoginUserBiz(store, hash, provider, 60*60*7*24)
+		business := biz.NewLoginUserBiz(store, hash, provider, 60*60*30*24)
 		token, err := business.LoginUser(c.Request.Context(), &login, codeEmail)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

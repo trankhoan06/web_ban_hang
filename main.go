@@ -86,11 +86,15 @@ func main() {
 		{
 			item.GET("/:id", ginItem.Getitem(db))
 			item.GET("/own/:id", ginItem.GetOwnitem(db))
+			item.GET("/list_sort_item", ginItem.ListSortItem(db))
 			item.PATCH("/:id", ginItem.UpdateItem(db))
+			item.PATCH("/update_sort_item", ginItem.UpdateSortItem(db))
 			item.POST("", ginItem.CreateItem(db))
+			item.POST("/sort_item", ginItem.CreateSortItem(db))
 			item.GET("", ginItem.ListItem(db))
 			item.GET("/own", ginItem.ListOwnItem(db))
 			item.DELETE("/:id", ginItem.DeletedItem(db))
+			item.DELETE("/deleted_sort_item", ginItem.DeletedSortItem(db))
 
 			item.POST("/:id/like", ginUserlikeItem.CreateLikeItem(db))
 			item.DELETE("/:id/unlike", ginUserlikeItem.UnLikeItem(db))

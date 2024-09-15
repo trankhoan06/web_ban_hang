@@ -7,6 +7,14 @@ import (
 
 const NameItem string = "id"
 
+type StatusItem int
+
+const (
+	StatusItemDeleted StatusItem = iota
+	StatusItemDoing
+	StatusItemDone
+)
+
 type TodoList struct {
 	Id          int               `json:"id" gorm:"column:id"`
 	UserId      int               `json:"-" gorm:"column:user_id"`

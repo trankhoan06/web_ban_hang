@@ -9,7 +9,7 @@ func (s *SqlModel) ListItem(ctx context.Context, paging *model.Paging, filter *m
 	var result []model.TodoList
 	db := s.db.Table("todo_items").Where("status<>?", "Deleted")
 	if f := filter; f != nil {
-		if v := f.Status; v != "" {
+		if v := f.Status; v != 0 {
 			db = db.Where("status=?", v)
 		}
 	}
