@@ -93,6 +93,7 @@ func main() {
 			item.POST("/sort_item", ginItem.CreateSortItem(db))
 			item.GET("", ginItem.ListItem(db))
 			item.GET("/own", ginItem.ListOwnItem(db))
+			item.GET("/category", ginItem.ListItemCategory(db))
 			item.DELETE("/:id", ginItem.DeletedItem(db))
 			item.DELETE("/deleted_sort_item", ginItem.DeletedSortItem(db))
 
