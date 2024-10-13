@@ -9,14 +9,13 @@ import (
 	"net/http"
 )
 
-func RegisterRole(db *gorm.DB) func(*gin.Context) {
+func DeletedAccount(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
-		role := c.Query("role")
 		userId := c.MustGet(common.Current_user).(common.Requester).GetUserId()
 		store := storage.NewSqlModel(db)
-		business := biz.NewRegisterRoleBiz(store)
-		if err := business.NewRegisterRole(c.Request.Context(), userId, role); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		business := biz.NewUserBiz(store)
+		if err := business.NewDeletedAccount(c.Request.Context(), userId); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"data": true})

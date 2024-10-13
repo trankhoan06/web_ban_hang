@@ -10,21 +10,20 @@ import (
 	"net/http"
 )
 
-func UpdateUser(db *gorm.DB) func(*gin.Context) {
+func UpdateInforUser(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var data model.UpdateUser
-		if err := c.ShouldBindJSON(&data); err != nil {
+		if err := c.ShouldBind(&data); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		request := c.MustGet(common.Current_user).(common.Requester)
+		data.Email = c.MustGet(common.Current_user).(common.Requester).GetEmail()
 		store := storage.NewSqlModel(db)
-		business := biz.NewUpdateUserBiz(store)
-		if err := business.NewUpdateUser(c.Request.Context(), &data, request); err != nil {
+		business := biz.NewUserBiz(store)
+		if err := business.NewUpdateInformationUser(c.Request.Context(), &data); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"update": true})
-
+		c.JSON(http.StatusOK, gin.H{"data": data})
 	}
 }

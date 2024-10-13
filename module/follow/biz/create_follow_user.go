@@ -10,7 +10,7 @@ import (
 func (biz *FollowUserBiz) CreateFollowUser(ctx context.Context, user *model.CreateFollower) (*modelUser.User, error) {
 	userAccount, err := biz.store1.FindUser(ctx, map[string]interface{}{"id": user.UserId})
 	if err == nil {
-		if userAccount.Status == 0 {
+		if *userAccount.Status == modelUser.StatusUserDeleted {
 			return nil, errors.New("account has been deleted")
 		}
 	}

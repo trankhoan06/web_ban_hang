@@ -10,6 +10,6 @@ import (
 func Profile(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
 		u := c.MustGet(common.Current_user).(common.Requester)
-		c.JSON(http.StatusOK, gin.H{"profile": u})
+		c.JSON(http.StatusOK, gin.H{"data": u})
 	}
 }

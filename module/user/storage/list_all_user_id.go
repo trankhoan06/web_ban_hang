@@ -5,8 +5,8 @@ import (
 	"main.go/module/user/model"
 )
 
-func (s *SqlModel) ListUserId(ctx context.Context) (*[]model.LIstUserId, error) {
-	var result []model.LIstUserId
+func (s *SqlModel) ListUserId(ctx context.Context) (*[]model.ListUserId, error) {
+	var result []model.ListUserId
 	if err := s.db.Table("users").Where("status<>?", 0).Find(&result).Error; err != nil {
 		return nil, err
 	}

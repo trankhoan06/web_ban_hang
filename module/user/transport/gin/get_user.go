@@ -11,18 +11,19 @@ import (
 
 func GetUser(db *gorm.DB) func(*gin.Context) {
 	return func(c *gin.Context) {
-		userId, err := strconv.Atoi(c.Query("user_id"))
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		userId, errUser := strconv.Atoi(c.Query("user_id"))
+		if errUser != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": errUser.Error()})
 			return
 		}
 		store := storage.NewSqlModel(db)
-		busines := biz.NewGetUserBiz(store)
-		user, err := busines.NewGetUser(c.Request.Context(), userId)
+		business := biz.NewUserBiz(store)
+		user, err := business.NewGetUser(c.Request.Context(), userId)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"user": user})
+		c.JSON(http.StatusOK, gin.H{"data": user})
+
 	}
 }

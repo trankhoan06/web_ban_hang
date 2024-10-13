@@ -2,36 +2,28 @@ package biz
 
 import (
 	"context"
-	"fmt"
-	"main.go/common"
-	"main.go/module/user/model"
+	"errors"
 	"time"
 )
 
-type VerifyCodeForgotPasswordStorage interface {
-	FindVerifyVerifyCode(ctx context.Context, email string) (*model.SendCode, error)
-	UpdateTokenCodeVerifyEmail(ctx context.Context, id int, token string) error
-}
-type VerifyCodeForgotPasswordBiz struct {
-	store VerifyCodeForgotPasswordStorage
-}
-
-func NewVerifyCodeForgotPasswordBiz(store VerifyCodeForgotPasswordStorage) *VerifyCodeForgotPasswordBiz {
-	return &VerifyCodeForgotPasswordBiz{store: store}
-}
-func (biz *VerifyCodeForgotPasswordBiz) NewVerifyCode(ctx context.Context, code int, email string) error {
-	verifyCode, err := biz.store.FindVerifyVerifyCode(ctx, email)
+func (biz *UserBiz) NewVerifyCodeForgotPassword(ctx context.Context, code int, token string, userId int) error {
+	sendCode, err := biz.store.FindSendCode(ctx, map[string]interface{}{"token": token, "user_id": userId})
 	if err != nil {
 		return err
 	}
-	if code != verifyCode.Code {
-		return fmt.Errorf("code not equal")
+	now := time.Now().Add(-7 * time.Hour)
+
+	if now.After(sendCode.Expire) {
+		return errors.New("code is expire")
 	}
-	now := time.Now()
-	if now.After(verifyCode.ExpireAt) {
-		return fmt.Errorf("code has been expire")
+	if code != sendCode.Code {
+		return errors.New("code is wrong")
 	}
-	token := common.GetSalt(50)
-	_ = biz.store.UpdateTokenCodeVerifyEmail(ctx, verifyCode.Id, token)
+	expire := time.Now().Add(-7 * time.Hour)
+	expire = expire.Add(30 * time.Minute)
+	if err := biz.store.UpdateForgot(ctx, token, userId, map[string]interface{}{"verify": true,
+		"expire_at": expire}); err != nil {
+		return err
+	}
 	return nil
 }

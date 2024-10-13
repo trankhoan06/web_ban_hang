@@ -1,86 +1,85 @@
 package model
 
-import (
-	"time"
-)
+import "time"
 
 type StatusUser int
 
 const (
-	StatusUserInactive StatusUser = iota
-	StatusUserActive
+	StatusUserDeleted StatusUser = iota
+	StatusUserDoing
+)
+
+type RoleUser int
+
+const (
+	RoleUserUser RoleUser = iota + 1
+	RoleUserAdmin
 )
 
 type User struct {
-	UserId      int        `json:"user_id" gorm:"column:id"`
-	Email       string     `json:"email" gorm:"column:email"`
-	Salt        string     `json:"salt" gorm:"column:salt"`
-	PassWord    string     `json:"password" gorm:"column:password"`
-	FirstName   string     `json:"firt_name" gorm:"column:firt_name"`
-	LastName    string     `json:"last_name" gorm:"column:last_name"`
-	Description string     `json:"description" gorm:"column:description"`
-	Phone       string     `json:"phone" gorm:"column:phone"`
-	Role        string     `json:"role" gorm:"column:role"`
-	IsEmail     *bool      `json:"-" gorm:"column:is_email"`
-	CreateAt    *time.Time `json:"create_at" gorm:"column:create_at"`
-	UpdateAt    *time.Time `json:"update_at" gorm:"column:update_at"`
-	Status      StatusUser `json:"status" gorm:"column:status"`
-}
-
-type SimpleUser struct {
-	UserId    int    `json:"user_id" gorm:"column:id"`
-	FirstName string `json:"first_name" gorm:"column:first_name"`
-	LastName  string `json:"last_name" gorm:"column:last_name"`
-	Status    int    `json:"status" gorm:"column:status"`
-}
-type UpdateUser struct {
-	UserId      int     `json:"-" gorm:"column:id"`
-	FirstName   *string `json:"first_name" gorm:"column:first_name"`
-	LastName    *string `json:"last_name" gorm:"column:last_name"`
-	Description *string `json:"description" gorm:"column:description"`
-	Phone       *string `json:"phone" gorm:"column:phone"`
-	Role        string  `json:"-" gorm:"column:role"`
-}
-type LIstUserId struct {
-	UserId int `json:"id" gorm:"column:id"`
+	Id          int         `json:"id" gorm:"column:id"`
+	Email       string      `json:"email" gorm:"column:email"`
+	Salt        string      `json:"salt" gorm:"column:salt"`
+	Password    string      `json:"password" gorm:"column:password"`
+	FirstName   string      `json:"first_name" gorm:"column:first_name"`
+	LastName    string      `json:"last_name" gorm:"column:last_name"`
+	Description string      `json:"description" gorm:"column:description"`
+	Phone       string      `json:"phone" gorm:"column:phone"`
+	Role        *RoleUser   `json:"role" gorm:"column:role"`
+	Status      *StatusUser `json:"status" gorm:"column:status"`
+	IsEmail     bool        `json:"is_email" gorm:"column:is_email"`
+	CreateAt    time.Time   `json:"create_at" gorm:"column:create_at"`
+	UpdateAt    time.Time   `json:"update_at" gorm:"column:update_at"`
 }
 
 func (u *User) GetUserId() int {
-	return u.UserId
-}
-func (u *User) GetRole() string {
-	return u.Role
+	return u.Id
 }
 func (u *User) GetEmail() string {
 	return u.Email
 }
+func (u *User) GetRole() *RoleUser {
+	return u.Role
+}
 
 type CreateUser struct {
-	UserId      int    `json:"user_id" gorm:"column:id"`
-	Email       string `json:"email" gorm:"column:email"`
-	PassWord    string `json:"password" gorm:"column:password"`
-	Description string `json:"description" gorm:"column:description"`
-	Salt        string `json:"-" gorm:"column:salt"`
-	Role        string `json:"-" gorm:"column:role"`
+	Id          int         `json:"id" gorm:"column:id"`
+	Email       string      `json:"email" gorm:"column:email"`
+	Status      *StatusUser `json:"-" gorm:"column:status"`
+	Salt        string      `json:"-" gorm:"column:salt"`
+	Password    string      `json:"password" gorm:"column:password"`
+	FirstName   string      `json:"first_name" gorm:"column:first_name"`
+	LastName    string      `json:"last_name" gorm:"column:last_name"`
+	Address     string      `json:"address" gorm:"column:address"`
+	Description string      `json:"description" gorm:"column:description"`
+	Phone       string      `json:"phone" gorm:"column:phone"`
 }
-type UpdatePasswordForgot struct {
-	PassWord string `json:"password" gorm:"column:password"`
+type UpdateUser struct {
+	Email       string  `json:"-" gorm:"column:email"`
+	FirstName   *string `json:"first_name" gorm:"column:first_name"`
+	LastName    *string `json:"last_name" gorm:"column:last_name"`
+	Description *string `json:"description" gorm:"column:description"`
+	Address     *string `json:"address" gorm:"column:address"`
+	Phone       *string `json:"phone" gorm:"column:phone"`
+}
+type SimpleUser struct {
+	Id        int    `json:"id" gorm:"column:id"`
+	FirstName string `json:"first_name" gorm:"column:first_name"`
+	LastName  string `json:"last_name" gorm:"column:last_name"`
+}
+type ListUserId struct {
+	UserId int `json:"id" gorm:"column:id"`
 }
 type LoginUser struct {
 	Email    string `json:"email" gorm:"column:email"`
-	PassWord string `json:"password" gorm:"column:password"`
+	Password string `json:"password" gorm:"column:password"`
 }
-type UpdatePass struct {
-	Email       string `json:"email" gorm:"column:email"`
-	PassWord    string `json:"password" gorm:"column:password"`
-	NewPassWord string `json:"new_password"`
+type ChangePassWord struct {
+	Password    string `json:"password" gorm:"column:password"`
+	NewPassword string `json:"new_password" gorm:"column:new_password"`
 }
 
-func (UpdatePass) TableName() string           { return "users" }
-func (LIstUserId) TableName() string           { return "users" }
-func (UpdatePasswordForgot) TableName() string { return "users" }
-func (User) TableName() string                 { return "users" }
-func (CreateUser) TableName() string           { return "users" }
-func (SimpleUser) TableName() string           { return "users" }
-func (UpdateUser) TableName() string           { return "users" }
-func (LoginUser) TableName() string            { return "users" }
+func (User) TableName() string       { return "users" }
+func (CreateUser) TableName() string { return "users" }
+func (UpdateUser) TableName() string { return "users" }
+func (SimpleUser) TableName() string { return "users" }

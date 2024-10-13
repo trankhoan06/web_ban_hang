@@ -1,25 +1,19 @@
 package common
 
 import (
-	"fmt"
 	modelComment "main.go/module/comment/model"
+	"main.go/module/user/model"
 )
 
-func Recovery() {
-	if err := recover(); err != nil {
-		fmt.Println("recovered:", err)
-	}
-}
-
 type Payload struct {
-	UId   int    `json:"user_id"`
-	URole string `json:"role"`
+	UId   int             `json:"user_id"`
+	URole *model.RoleUser `json:"role"`
 }
 
 func (p *Payload) GetUser() int {
 	return p.UId
 }
-func (p *Payload) GetRole() string {
+func (p *Payload) GetRole() *model.RoleUser {
 	return p.URole
 }
 
@@ -27,7 +21,7 @@ const Current_user = "current_user"
 
 type Requester interface {
 	GetUserId() int
-	GetRole() string
+	GetRole() *model.RoleUser
 	GetEmail() string
 }
 type TreeComment struct {

@@ -7,7 +7,6 @@ import (
 	"main.go/module/notify/biz"
 	"main.go/module/notify/model"
 	"main.go/module/notify/storage"
-	bizUser "main.go/module/user/biz"
 	storageUser "main.go/module/user/storage"
 	"net/http"
 )
@@ -23,9 +22,8 @@ func SendAllNotify(db *gorm.DB) func(*gin.Context) {
 		notify.TypeMessage = model.TypeEvent
 		storeUser := storageUser.NewSqlModel(db)
 		store := storage.NewSQLModel(db)
-		businessUser := bizUser.NewListAllUserIDBiz(storeUser)
 		business := biz.NewNotifyUserBiz(store, storeUser)
-		result, err := businessUser.NewListAllUserID(c.Request.Context())
+		result, err := storeUser.ListUserId(c.Request.Context())
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

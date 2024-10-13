@@ -7,7 +7,5 @@ type SqlModel struct {
 }
 
 func NewSqlModel(db *gorm.DB) *SqlModel {
-	return &SqlModel{
-		db: db,
-	}
+	return &SqlModel{db: db}
 }

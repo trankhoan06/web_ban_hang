@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"main.go/common"
 	"main.go/component/tokenProvider"
@@ -39,12 +38,6 @@ func RequesMiddleware(authorize Authorize, provider tokenProvider.Provider) func
 		user, err := authorize.FindUser(c.Request.Context(), map[string]interface{}{"id": payLoad.GetUser()})
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		if user.Status == 0 {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprint("user has been deleted of banned"),
-			})
 			return
 		}
 		c.Set(common.Current_user, user)

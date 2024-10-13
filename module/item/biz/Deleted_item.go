@@ -4,6 +4,7 @@ import (
 	"context"
 	"main.go/common"
 	"main.go/module/item/model"
+	modelUser "main.go/module/user/model"
 )
 
 type DeletedItemStorage interface {
@@ -23,7 +24,8 @@ func (biz *DeletedItemBiz) DeleteItem(ctx context.Context, id int) error {
 	if err != nil {
 		return err
 	}
-	if biz.request.GetRole() != "admin" && biz.request.GetUserId() != item.UserId {
+	role := biz.request.GetRole()
+	if *role != modelUser.RoleUserUser && biz.request.GetUserId() != item.UserId {
 		return common.ErrNoPermiss
 	}
 	if err1 := biz.store.DeletedItem(ctx, map[string]interface{}{"id": id}); err1 != nil {

@@ -7,12 +7,12 @@ import (
 	modelUser "main.go/module/user/model"
 )
 
-func (biz *NotifyUserBiz) NewUserSendAllNotify(ctx context.Context, result *[]modelUser.LIstUserId, notify *model.CreateNotify) error {
+func (biz *NotifyUserBiz) NewUserSendAllNotify(ctx context.Context, result *[]modelUser.ListUserId, notify *model.CreateNotify) error {
 	user, err := biz.store1.FindUser(ctx, map[string]interface{}{"id": notify.CreatorId})
 	if err != nil {
 		return err
 	}
-	if user.Role != "admin" {
+	if *user.Role != modelUser.RoleUserAdmin {
 		return common.ErrNoPermiss
 	}
 	for _, val := range *result {
