@@ -30,13 +30,13 @@ func (biz *LoginBiz) NewLogin(ctx context.Context, login *model.LoginUser, expir
 		verify.Token = token
 		verify.Id = user.Id
 		code := common.GenerateRandomCode()
-		expire := time.Now().UTC().Add(-7 * time.Hour)
-		expire = expire.Add(1 * time.Minute)
+		expire1 := time.Now().UTC().Add(-7 * time.Hour)
+		expire1 = expire1.Add(1 * time.Minute)
 		var sendCode model.CreateSendCode
 		sendCode.Code = code
 		sendCode.Token = token
 		sendCode.Email = login.Email
-		sendCode.Expire = expire
+		sendCode.Expire = expire1
 		if err := biz.store.CreateSendCode(ctx, &sendCode); err != nil {
 			return &verify, err
 		}
@@ -52,7 +52,8 @@ func (biz *LoginBiz) NewLogin(ctx context.Context, login *model.LoginUser, expir
 			}
 
 		}()
-		defer close(chanel)
+		wg.Wait()
+		close(chanel)
 		return &verify, <-chanel
 	}
 	verify.IsEmail = true

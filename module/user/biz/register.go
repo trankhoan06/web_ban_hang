@@ -63,6 +63,7 @@ func (biz *RegisterBiz) NewRegister(ctx context.Context, data *model.CreateUser)
 		}
 
 	}()
-	defer close(chanel)
+	wg.Wait()
+	close(chanel)
 	return &verify, <-chanel
 }
