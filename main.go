@@ -43,7 +43,7 @@ func main() {
 		v1.GET("/profile", middlewareAuthor, ginUser2.Profile(db))
 		v1.PUT("/upload", upload.Upload_image(db))
 		v1.POST("/register", ginUser2.Register(db))
-		v1.PATCH("/verify_email", ginUser2.VerifyCodeEmail(db))
+		v1.PATCH("/verify_email", ginUser2.VerifyCodeEmail(db, token))
 		v1.POST("/login", ginUser2.Login(db, token))
 		v1.PATCH("/change_password", middlewareAuthor, ginUser2.ChangePassword(db))
 		v1.POST("/forgot_password", ginUser2.ForgotPassword(db))
