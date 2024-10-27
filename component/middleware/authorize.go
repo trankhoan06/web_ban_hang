@@ -4,10 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"log"
 	"main.go/common"
-	"main.go/component/tokenProvider"
 	"main.go/module/user/model"
-	"net/http"
 	"strings"
 )
 
@@ -23,22 +22,22 @@ func Extractoken(s string) (string, error) {
 	return str[1], nil
 }
 
-func RequesMiddleware(authorize Authorize, provider tokenProvider.Provider) func(*gin.Context) {
+func (j *MiddlewareManager) RequesMiddleware() func(*gin.Context) {
 	return func(c *gin.Context) {
 		s, err := Extractoken(c.GetHeader("Authorization"))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			log.Println("Extractoken err:", err)
+			panic(common.ErrUnauthorized(err))
 		}
-		payLoad, err := provider.Validate(s)
+		payLoad, err := j.token.Validate(s)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			log.Println("token err", err)
+			panic(common.ErrUnauthorized(err))
 		}
-		user, err := authorize.FindUser(c.Request.Context(), map[string]interface{}{"id": payLoad.GetUser()})
+		user, err := j.authen.FindUser(c.Request.Context(), map[string]interface{}{"id": payLoad.GetUser()})
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			log.Println("user has been deleted", err)
+			panic(common.ErrUnauthorized(err))
 		}
 		c.Set(common.Current_user, user)
 		c.Next()

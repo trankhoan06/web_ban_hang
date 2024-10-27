@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -30,28 +31,31 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	token := jwt.NewJwtProvider("jwt", "Khoandz123@")
+	token := jwt.NewJwtProvider(os.Getenv("prefix"), os.Getenv("secret"))
 	author := storage.NewSqlModel(db)
-	middlewareAuthor := middleware.RequesMiddleware(author, token)
+	middlewareAuthor := middleware.NewMiddlewareManager(token, author)
 	r := gin.Default()
+	configCORS := setupCors()
+	r.Use(cors.New(configCORS))
+	r.Use(middlewareAuthor.Recover())
 	r.Static("/static", "./static")
 	v1 := r.Group("/v1")
 	{
-		v1.PATCH("/updateUser", middlewareAuthor, ginUser2.UpdateInforUser(db))
-		//v1.PATCH("/register_role", middlewareAuthor, ginUser2.RegisterRole(db))
+		v1.PATCH("/updateUser", middlewareAuthor.RequesMiddleware(), ginUser2.UpdateInforUser(db))
+		//v1.PATCH("/register_role", middlewareAuthor.RequesMiddleware(), ginUser2.RegisterRole(db))
 		v1.PATCH("/change_forgot_password", ginUser2.ChangePasswordForgot(db))
-		v1.GET("/profile", middlewareAuthor, ginUser2.Profile(db))
+		v1.GET("/profile", middlewareAuthor.RequesMiddleware(), ginUser2.Profile(db))
 		v1.PUT("/upload", upload.Upload_image(db))
 		v1.POST("/register", ginUser2.Register(db))
 		v1.PATCH("/verify_email", ginUser2.VerifyCodeEmail(db, token))
 		v1.POST("/login", ginUser2.Login(db, token))
-		v1.PATCH("/change_password", middlewareAuthor, ginUser2.ChangePassword(db))
+		v1.PATCH("/change_password", middlewareAuthor.RequesMiddleware(), ginUser2.ChangePassword(db))
 		v1.POST("/forgot_password", ginUser2.ForgotPassword(db))
 		v1.GET("/forgotPassword/verifyCode", ginUser2.VerifyCodeForgotPassword(db))
 		v1.PATCH("/update_password_forgot", ginUser2.ChangePasswordForgot(db))
-		v1.DELETE("/deleted_user", middlewareAuthor, ginUser2.DeletedAccount(db))
+		v1.DELETE("/deleted_user", middlewareAuthor.RequesMiddleware(), ginUser2.DeletedAccount(db))
 		v1.GET("/user", ginUser2.GetUser(db))
-		cart := v1.Group("/cart", middlewareAuthor)
+		cart := v1.Group("/cart", middlewareAuthor.RequesMiddleware())
 		{
 			cart.POST("", gincart.AddItem(db))
 			cart.GET("/:itemId", gincart.GetItem(db))
@@ -59,7 +63,7 @@ func main() {
 			cart.PATCH("/update/:id", gincart.UpdateItemCart(db))
 			cart.DELETE("/deleted/:id", gincart.DeletedItemCart(db))
 		}
-		comment := v1.Group("/comment", middlewareAuthor)
+		comment := v1.Group("/comment", middlewareAuthor.RequesMiddleware())
 		{
 			comment.POST("/:item_id", ginComment.CreateComment(db))
 			comment.POST("/email/:email", ginComment.SendEmail(db))
@@ -69,7 +73,7 @@ func main() {
 			comment.GET("/old_comment/:item_id/:id", ginComment.GetOldComment(db))
 			comment.DELETE("/deleted_comment/:item_id/:id", ginComment.DeletedComment(db))
 		}
-		order := v1.Group("/order", middlewareAuthor)
+		order := v1.Group("/order", middlewareAuthor.RequesMiddleware())
 		{
 			order.POST("/create_order", ginOrder.CreateOrder(db))
 			order.POST("/appreciate", ginOrder.AppreciateItem(db))
@@ -83,7 +87,7 @@ func main() {
 			order.PATCH("/update_status_sell", ginOrder.UpdateStatusSell(db))
 			order.DELETE("/cancel", ginOrder.CancelOrder(db))
 		}
-		item := v1.Group("/items", middlewareAuthor)
+		item := v1.Group("/items", middlewareAuthor.RequesMiddleware())
 		{
 			item.GET("/:id", ginItem.Getitem(db))
 			item.GET("/own/:id", ginItem.GetOwnitem(db))
@@ -102,14 +106,14 @@ func main() {
 			item.DELETE("/:id/unlike", ginUserlikeItem.UnLikeItem(db))
 			item.GET("/:id/listlikeitem", ginUserlikeItem.ListLike(db))
 		}
-		search := v1.Group("/search", middlewareAuthor)
+		search := v1.Group("/search", middlewareAuthor.RequesMiddleware())
 		{
 			search.GET("/result", ginSearch.SearchItem(db))
 			search.GET("/list_keyword", ginSearch.ListKeyword(db))
 			search.DELETE("/deleted_keyword", ginSearch.DeletedKeyword(db))
 			search.DELETE("/deleted_all_keyword", ginSearch.DeletedAllKeyword(db))
 		}
-		follow := v1.Group("/follow", middlewareAuthor)
+		follow := v1.Group("/follow", middlewareAuthor.RequesMiddleware())
 		{
 			follow.POST("/create", ginFollow.CreateFollow(db))
 			follow.GET("/list_follow", ginFollow.ListUserFollow(db))
@@ -118,7 +122,7 @@ func main() {
 			follow.GET("/amount_user_follow", ginFollow.GetAmountUserFollow(db))
 			follow.DELETE("/Unfollow", ginFollow.UnFollow(db))
 		}
-		notify := v1.Group("/notify", middlewareAuthor)
+		notify := v1.Group("/notify", middlewareAuthor.RequesMiddleware())
 		{
 			notify.POST("/send_notify", ginNotify.SendNotify(db))
 			notify.POST("/send_all_notify", ginNotify.SendAllNotify(db))
@@ -128,7 +132,7 @@ func main() {
 			notify.DELETE("/deleted_notify", ginNotify.DeletedNotify(db))
 			notify.DELETE("/deleted_notify_of_creator", ginNotify.DeletedNotifyOfCreator(db))
 		}
-		message := v1.Group("/message", middlewareAuthor)
+		message := v1.Group("/message", middlewareAuthor.RequesMiddleware())
 		{
 			message.GET("/list_message", ginMessage.ListMessage(db))
 			message.GET("/list_user_message", ginMessage.ListUserMessage(db))
@@ -136,7 +140,7 @@ func main() {
 			message.DELETE("/deleted_message", ginMessage.DeletedMessage(db))
 			message.DELETE("/deleted_user_message", ginMessage.DeletedUserMessage(db))
 		}
-		voucher := v1.Group("/voucher", middlewareAuthor)
+		voucher := v1.Group("/voucher", middlewareAuthor.RequesMiddleware())
 		{
 			voucher.POST("/create", ginVoucher.CreateVoucher(db))
 			voucher.POST("/add_voucher", ginVoucher.AddVoucher(db))
@@ -148,4 +152,14 @@ func main() {
 	}
 
 	r.Run(":3000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+}
+func setupCors() cors.Config {
+	configCORS := cors.DefaultConfig()
+	configCORS.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+	configCORS.AllowHeaders = []string{"Origin", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Cache-Control", "X-Requested-With", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials"}
+	configCORS.AllowCredentials = true
+	//configCORS.AllowOrigins = []string{"http://localhost:3000"}
+	configCORS.AllowAllOrigins = true
+
+	return configCORS
 }

@@ -49,7 +49,11 @@ func NewAuthorize(root error, msg, log, key string) *AppError {
 		key,
 	}
 }
-func NewCustormErr(root error, msg, key string) *AppError {
+func ErrInternal(err error) *AppError {
+	return NewFullErrorResponse(http.StatusInternalServerError, err,
+		"Something went wrong in the server", err.Error(), "ErrInternal")
+}
+func NewCustomErr(root error, msg, key string) *AppError {
 	if root != nil {
 		return NewAppError(root, msg, root.Error(), key)
 	}
@@ -59,29 +63,32 @@ func ErrDb(err error) *AppError {
 	return NewFullErrorResponse(http.StatusInternalServerError, err, "Something went wrong with DB", err.Error(), "DB_ERROR")
 }
 func ErrInvalid(err error) *AppError {
-	return NewCustormErr(err, "Invalid request", "ERRVALID")
+	return NewCustomErr(err, "Invalid request", "ERRVALID")
 }
 func ErrEmailOfPass(err error) *AppError {
-	return NewCustormErr(err, "email of pass invalid", "ERRVALID")
+	return NewCustomErr(err, "email of pass invalid", "ERRVALID")
 }
 func ErrPass(err error) *AppError {
-	return NewCustormErr(err, "pass invalid", "ERRVALID")
+	return NewCustomErr(err, "pass invalid", "ERRVALID")
 }
 func ErrItem(err error) *AppError {
-	return NewCustormErr(err, "item not found", "ERRITEM")
+	return NewCustomErr(err, "item not found", "ERRITEM")
 }
 func ErrCart(err error) *AppError {
-	return NewCustormErr(err, "cart haven't this item of this itetm has been deleted", "ERRITEM_CART")
+	return NewCustomErr(err, "cart haven't this item of this itetm has been deleted", "ERRITEM_CART")
+}
+func ErrUnauthorized(err error) *AppError {
+	return NewFullErrorResponse(http.StatusUnauthorized, err, "Unauthorized", err.Error(), "ErrUnauthorized")
 }
 func ErrCommonDeleted(err error) *AppError {
-	return NewCustormErr(err, "comment haven't this item of this comment has been deleted of no exist", "ERRCOMMENT")
+	return NewCustomErr(err, "comment haven't this item of this comment has been deleted of no exist", "ERRCOMMENT")
 }
 func ErrUserUpdate(err error) *AppError {
-	return NewCustormErr(err, "no permission", "ERRITEM_USER")
+	return NewCustomErr(err, "no permission", "ERRITEM_USER")
 }
 func ErrUneditedUpdate(err error) *AppError {
-	return NewCustormErr(err, "no permission", "ERRITEM_USER")
+	return NewCustomErr(err, "no permission", "ERRITEM_USER")
 }
 func ErrOrder(err error) *AppError {
-	return NewCustormErr(err, "you don't order this item", "ERRITEM_USER")
+	return NewCustomErr(err, "you don't order this item", "ERRITEM_USER")
 }

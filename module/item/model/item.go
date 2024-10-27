@@ -18,7 +18,7 @@ const (
 type TodoList struct {
 	Id          int               `json:"id" gorm:"column:id"`
 	UserId      int               `json:"-" gorm:"column:user_id"`
-	Owner       *model.SimpleUser `json:"owner" gorm:"foreignkey:UserId;references:UserId"`
+	Owner       *model.SimpleUser `json:"owner" gorm:"foreignkey:UserId;references:id"`
 	Title       string            `json:"title" gorm:"column:title"`
 	Description string            `json:"description" gorm:"column:description"`
 	Price       int               `json:"price" gorm:"column:price"`
