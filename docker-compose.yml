@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  go-itask:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Đường dẫn đến Dockerfile
+    container_name: go-itask-container
+    environment:
+      - DB_HOST=project_personal
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=mydatabase
+    ports:
+      - "8080:8080"  # Cổng để truy cập ứng dụng Go từ máy host
+    depends_on:
+      - project_personal  # Đảm bảo container project_personal chạy trước
+
+  project_personal:
+    image: mysql:5.7  # Hoặc bất kỳ image MySQL nào bạn đang sử dụng
+    container_name: project_personal
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=mydatabase
+    ports:
+      - "3309:3306"  # Cổng MySQL của container
+    volumes:
+      - ./data/db:/var/lib/mysql  # Nếu bạn muốn lưu trữ dữ liệu MySQL trên máy host
+
+networks:
+  default:
+    name: project_network  # Tạo mạng Docker để các container có thể giao tiếp với nhau
